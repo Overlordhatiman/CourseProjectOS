@@ -10,6 +10,7 @@ using WebUI.DBEntities;
 
 namespace WebUI.Controllers
 {
+    [Authorize]
     public class TypesController : Controller
     {
         private ArmyContext db = new ArmyContext();
