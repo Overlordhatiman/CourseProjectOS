@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using WebUI.DBEntities;
+using WebUI.Models;
 
 namespace WebUI.Controllers
 {
@@ -20,6 +21,25 @@ namespace WebUI.Controllers
         {
             var types = db.Types.Include(t => t.Army);
             return View(types.ToList());
+        }
+
+        public ActionResult Info()
+        {           
+            var result =
+                from player in db.Types.Include(t => t.Army)
+                group player by player.Army.Name into playerGroup
+                select new
+                {
+                    Name = playerGroup.Key,
+                    Number = playerGroup.Sum(x => x.Count),
+                };
+            List<ArmiesCount> res = new List<ArmiesCount>();
+            foreach (var item in result)
+            {
+                res.Add(new ArmiesCount { Name = item.Name, Number = item.Number});
+            }
+
+            return View(res.ToList());
         }
 
         // GET: Types/Details/5
@@ -42,6 +62,31 @@ namespace WebUI.Controllers
         {
             ViewBag.ArmyId = new SelectList(db.Armys, "Id", "Name");
             return View();
+        }
+
+        public ActionResult AddMore()
+        {
+            ViewBag.Number = 1;
+            ViewBag.ArmyId = new SelectList(db.Armys, "Id", "Name");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddMore([Bind(Include = "Id,Name,Count,ArmyId")] WebUI.DBEntities.Type type, int number)
+        {
+            if (ModelState.IsValid)
+            {
+                for (int i = 0; i < number; i++)
+                {
+                    db.Types.Add(type);
+                    db.SaveChanges();
+                }
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.ArmyId = new SelectList(db.Armys, "Id", "Name", type.ArmyId);
+            return View(type);
         }
 
         [HttpPost]

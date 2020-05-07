@@ -1,0 +1,29 @@
+﻿@model List<WebUI.Models.ArmiesCount>
+
+@{
+    ViewBag.Title = "Info";
+}
+
+<h2>Info</h2>
+<table class="table table-hover">
+    <tr class="table-dark">
+        <th>
+            Country
+        </th>
+        <th>
+           Number of Armie
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr class="table-danger">
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Number)
+            </td>
+        </tr>
+    }
+</table>
